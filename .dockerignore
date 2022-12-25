@@ -1,0 +1,9 @@
+.git/
+.database/
+
+.dockerignore
+.gitignore
+
+README.md
+CONTRIBUTING.md
+LICENSE

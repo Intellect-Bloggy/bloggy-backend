@@ -8,8 +8,8 @@ services:
     ports:
       - 8000:8000
     depends_on:
-       db:
-         condition: service_healthy
+      db:
+        condition: service_healthy
     environment:
       - PORT=8000
       - POSTGRES_LOCAL_PORT=5432
@@ -17,6 +17,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres
       - POSTGRES_PASSWORD=docker
+      - POSTGRES_SSLMode=disable
     restart: 'no'
   db:
     restart: always
@@ -29,5 +30,21 @@ services:
       - 5436:5432
     healthcheck:
       test: "pg_isready --username=postgres && psql --username=postgres --list"
-      timeout: 10s
-      retries: 20
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./schema:/schema
+    command:
+      [
+          "-path",
+          "/schema",
+          "-database",
+          "postgres://postgres:docker@db:5432/postgres?sslmode=disable",
+          "up"
+      ]
+    depends_on:
+      db:
+        condition: service_healthy
